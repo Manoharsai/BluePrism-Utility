@@ -1,4 +1,4 @@
-﻿<process name="MS Excel VBO" version="6.3.0.6190" bpversion="6.3.0.6190" narrative="The VBO replacement for the Common Automation Excel business object" byrefcollection="true" type="object" runmode="Exclusive" preferredid="66085a0f-6bf6-45e2-b5ed-6345f014f05b">
+﻿<process name="github" version="6.3.0.6190" bpversion="6.3.0.6190" narrative="The VBO replacement for the Common Automation Excel business object" byrefcollection="true" type="object" runmode="Exclusive" preferredid="d99ec055-ff8c-4ff8-93a0-bc1f2e87cc2a">
   <appdef>
     <element name="Application Root">
       <id>ca515603-8af2-4608-8a70-31028a7d9a0b</id>
@@ -284,14 +284,6 @@
     <view>
       <camerax>-17</camerax>
       <cameray>-54</cameray>
-      <zoom version="2">1.25</zoom>
-    </view>
-  </subsheet>
-  <subsheet subsheetid="de91c894-3c34-40dc-ba12-6177f27f5ef5" type="Normal" published="True">
-    <name>Get Worksheet As Collection - OdontoPrev</name>
-    <view>
-      <camerax>-17</camerax>
-      <cameray>-33</cameray>
       <zoom version="2">1.25</zoom>
     </view>
   </subsheet>
@@ -3798,6 +3790,8 @@ Dim _vbTab as String = ";"
 	ws.UsedRange.Copy()
 
 	Dim data As String = Clipboard.GetDataObject().GetData(DataFormats.Text, True)
+	data = Replace(data, "=T", "")
+	data = Replace(data, """", "")
 	
 	' The data split into rows
 	Dim asRows() As String = Split(data, vbCrLf)
@@ -3805,10 +3799,12 @@ Dim _vbTab as String = ";"
 	Dim table As New DataTable()
 	' Set a flag indicating the header row
 	Dim isHeaderRow As Boolean = True
+	Dim colunas as Integer = 0
+
 	
 	For Each strRow As String In asRows
+
 		If Not String.IsNullOrEmpty(strRow) Then
-		
 			Dim fields() As String = Split(strRow, _vbTab)
 			If isHeaderRow Then
 			
@@ -3816,25 +3812,21 @@ Dim _vbTab as String = ";"
 				For Each field As String in fields
 					field = field.Trim()
 					table.Columns.Add(field)
-		
 				Next
-				
+				colunas = fields.Length				
 			Else
 
 				Dim row as DataRow = table.NewRow()
-				For i As Integer = 0 To fields.Length - 1
-					If i < fields.Length Then
+				For i As Integer = 0 To fields.Length - 1 
+					If (i < colunas  ) Then 
 						row(i) = fields(i)
 					Else
-						row(i) = ""
+				
 					End If
 				Next I
-				table.Rows.Add(row)
-				
-			End If
-				
+				table.Rows.Add(row)				
+			End If				
 		End If
-		
 	Next
 	worksheetcollection = table]]></code>
   </stage>
@@ -12069,285 +12061,6 @@ mLastException = Nothing]]></code>
   </stage>
   <stage stageid="897f2a3f-8d17-4a69-9505-0e3102c8b3a2" name="errorTest" type="Data">
     <subsheetid>8e22a2d9-d4c3-4fe0-bbf0-4788d1812d30</subsheetid>
-    <narrative>
-    </narrative>
-    <displayx>135</displayx>
-    <displayy>-120</displayy>
-    <displaywidth>60</displaywidth>
-    <displayheight>30</displayheight>
-    <font family="Segoe UI" size="10" style="Regular" color="000000" />
-    <datatype>text</datatype>
-    <initialvalue />
-    <private />
-    <alwaysinit />
-  </stage>
-  <stage stageid="bd67e89c-86bc-4e1a-b853-af65acb76e10" name="Get Worksheet As Collection" type="SubSheetInfo">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <narrative>Gets the current worksheet into a collection. This will read the worksheet and store the contents into the collection. The first row will be treated as the column names and will be used as the column names in the generated collection.
-
-Params:
-- handle : Number : The integer identifying the instance in which the worksheet resides. Default (0) indicates the current instance.
-- Workbook Name : Text : The name of the workbook on which the sheet resides. Default ("") indicates the active workbook on the instance.
-- Worksheet Name : Text : The name of the worksheet which is required as a collection. Default ("") indicates the active sheet within the workbook.
-
-Output:
-Data - Collection - The data from the worksheet.
-
-Exceptions: 
-- Bad Handle : If the given handle did not correspond to an instance.
-- Workbook Not Found : If the given workbook did not exist on the specified instance.
-- Worksheet Not Found : If the specified worksheet does not exist on the specified workbook.
-
-Office 2013 onwards
-There are known issues when attempting to read and write data using the Excel VBO with the application set to run in background mode. These issues can be overcome by using the Show action</narrative>
-    <displayx>-285</displayx>
-    <displayy>-195</displayy>
-    <displaywidth>420</displaywidth>
-    <displayheight>270</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-  </stage>
-  <stage stageid="a2c66238-40a5-4eb8-96aa-49fd4df567da" name="End" type="End">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <loginhibit />
-    <narrative>
-    </narrative>
-    <displayx>15</displayx>
-    <displayy>60</displayy>
-    <displaywidth>60</displaywidth>
-    <displayheight>30</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-    <outputs>
-      <output type="collection" name="Data" narrative="The collection containing the data from the specified worksheet - the column IDs will be gleaned from the first row on the sheet being retrieved." stage="worksheetcollection" />
-    </outputs>
-  </stage>
-  <stage stageid="e0221455-00ef-49a0-b754-5af68fc33f10" name="handle" type="Data">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <narrative>
-    </narrative>
-    <displayx>-195</displayx>
-    <displayy>-30</displayy>
-    <displaywidth>120</displaywidth>
-    <displayheight>30</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-    <datatype>number</datatype>
-    <initialvalue>0</initialvalue>
-    <private />
-    <alwaysinit />
-  </stage>
-  <stage stageid="7c5c7ae1-de66-41a1-a38f-56a9decd9189" name="workbookname" type="Data">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <narrative>
-    </narrative>
-    <displayx>-195</displayx>
-    <displayy>15</displayy>
-    <displaywidth>120</displaywidth>
-    <displayheight>30</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-    <datatype>text</datatype>
-    <initialvalue />
-    <private />
-    <alwaysinit />
-  </stage>
-  <stage stageid="708610a3-fc90-4cd4-ad57-4d70d7f9451e" name="Start" type="Start">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <loginhibit />
-    <narrative>
-    </narrative>
-    <displayx>15</displayx>
-    <displayy>-285</displayy>
-    <displaywidth>60</displaywidth>
-    <displayheight>30</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-    <inputs>
-      <input type="number" name="handle" narrative="The integer handle identifying the instance on which the worksheet which should be retrieved resides. The default of zero indicates the currently active instance." stage="handle" />
-      <input type="text" name="Workbook Name" narrative="The name of the workbook which contains the sheet required. The default empty text indicates the currently active workbook on the specified instance." stage="workbookname" />
-      <input type="text" name="Worksheet Name" narrative="The name of the worksheet within the specified workbook which should be written to a collection. The default empty text indicates the currently active worksheet within the specified workbook." stage="worksheetname" />
-    </inputs>
-    <onsuccess>b2458fad-6717-45ad-af15-0592ab6669b0</onsuccess>
-  </stage>
-  <stage stageid="ae0e2285-334c-453b-881a-1d2a6eb6140f" name="GetWorksheetAsCollectionOdonto" type="Code">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <loginhibit />
-    <narrative>
-    </narrative>
-    <displayx>15</displayx>
-    <displayy>-120</displayy>
-    <displaywidth>150</displaywidth>
-    <displayheight>30</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-    <inputs>
-      <input type="number" name="handle" expr="[handle]" />
-      <input type="text" name="workbookname" expr="[workbookname]" />
-      <input type="text" name="worksheetname" expr="[worksheetname]" />
-    </inputs>
-    <outputs>
-      <output type="collection" name="worksheetcollection" stage="worksheetcollection" />
-      <output type="flag" name="sheetexists" stage="sheetexists" />
-      <output type="text" name="name" stage="errorTest" />
-    </outputs>
-    <onsuccess>46989d89-b61a-4b04-8076-2f5d5e55d8bf</onsuccess>
-    <code><![CDATA[
-'	Dim ws as Object = _
-'	 GetWorksheet(handle, workbookname, worksheetname, False)
-	' Do we have a sheet?
-'	sheetexists = ws IsNot Nothing
-'	' No sheet? No entry.
-'	If Not sheetexists Then Return
-'	ws.Activate()
-'	ws.UsedRange.Select()
-'	ws.UsedRange.Copy()
-'	Dim data As String = GetClipboardText()	
-'	worksheetCollection = ParseDelimSeparatedVariables( _
-'	 data, vbTab, Nothing, True)
-'trying to fix casual error about commas and semicolons
-'fixing files with quotes and =T
-
-
-Dim _vbTab as String = ";"
-
-	Dim ws as Object = GetWorksheet(handle, workbookname, worksheetname, False)
-
-	' Do we have a sheet?
-	sheetexists = ws IsNot Nothing
-	' No sheet? No entry.
-	If Not sheetexists Then Return
-
-	ws.Activate()
-	ws.UsedRange.Select()
-	ws.UsedRange.Copy()
-
-	Dim data As String = Clipboard.GetDataObject().GetData(DataFormats.Text, True)
-	data = Replace(data, "=T", "")
-	data = Replace(data, """", "")
-	
-	' The data split into rows
-	Dim asRows() As String = Split(data, vbCrLf)
-	
-	Dim table As New DataTable()
-	' Set a flag indicating the header row
-	Dim isHeaderRow As Boolean = True
-	Dim colunas as Integer = 0
-
-	
-	For Each strRow As String In asRows
-
-		'strRow = Replace(strRow, "=T", "")
-		'strRow = Replace(strRow, """", "")
-
-
-		If Not String.IsNullOrEmpty(strRow) Then
-			Dim fields() As String = Split(strRow, _vbTab)
-			If isHeaderRow Then
-			
-				isHeaderRow = False
-				For Each field As String in fields
-					field = field.Trim()
-					table.Columns.Add(field)
-				Next
-				'name = ("cabecalho" & fields.Length)
-				colunas = fields.Length
-				
-			Else
-
-				Dim row as DataRow = table.NewRow()
-				For i As Integer = 0 To fields.Length - 1 
-					If (i < colunas  ) Then 
-						row(i) = fields(i)
-					Else
-					'	row(i) = ""
-					End If
-				Next I
-				table.Rows.Add(row)				
-			End If				
-		End If
-	Next
-	worksheetcollection = table]]></code>
-  </stage>
-  <stage stageid="b2458fad-6717-45ad-af15-0592ab6669b0" name="CheckInstanceAndWorkbook" type="SubSheet">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <loginhibit />
-    <narrative>
-    </narrative>
-    <displayx>15</displayx>
-    <displayy>-210</displayy>
-    <displaywidth>150</displaywidth>
-    <displayheight>30</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-    <inputs>
-      <input type="number" name="handle" expr="[handle]" />
-      <input type="text" name="workbookname" expr="[workbookname]" />
-    </inputs>
-    <onsuccess>ae0e2285-334c-453b-881a-1d2a6eb6140f</onsuccess>
-    <processid>9f7a4a91-68c9-4871-bb65-417e96cc4ad1</processid>
-  </stage>
-  <stage stageid="3a90540f-172a-448d-9418-7daf6ee16b1f" name="worksheetname" type="Data">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <narrative>
-    </narrative>
-    <displayx>-195</displayx>
-    <displayy>60</displayy>
-    <displaywidth>120</displaywidth>
-    <displayheight>30</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-    <datatype>text</datatype>
-    <initialvalue />
-    <private />
-    <alwaysinit />
-  </stage>
-  <stage stageid="f5442eac-9e88-4ded-ac8a-94306073ee60" name="worksheetcollection" type="Collection">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <narrative>
-    </narrative>
-    <displayx>-345</displayx>
-    <displayy>-15</displayy>
-    <displaywidth>150</displaywidth>
-    <displayheight>60</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-    <datatype>collection</datatype>
-    <private />
-    <alwaysinit />
-  </stage>
-  <stage stageid="46989d89-b61a-4b04-8076-2f5d5e55d8bf" name="Sheet Exists?" type="Decision">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <loginhibit />
-    <narrative>
-    </narrative>
-    <displayx>15</displayx>
-    <displayy>-15</displayy>
-    <displaywidth>90</displaywidth>
-    <displayheight>30</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-    <decision expression="[sheetexists]" />
-    <ontrue>a2c66238-40a5-4eb8-96aa-49fd4df567da</ontrue>
-    <onfalse>94417a0c-4d56-4d70-9dab-b5c44cc7dc24</onfalse>
-  </stage>
-  <stage stageid="94417a0c-4d56-4d70-9dab-b5c44cc7dc24" name="No Such Sheet" type="Exception">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <narrative>
-    </narrative>
-    <displayx>165</displayx>
-    <displayy>-15</displayy>
-    <displaywidth>90</displaywidth>
-    <displayheight>30</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-    <exception type="Worksheet Not Found" detail="&quot;No worksheet was found with the name '&quot; &amp; [worksheetname] &amp; &quot;' on the workbook '&quot; &amp; [workbookname] &amp; &quot;' within the instance with the handle: &quot; &amp; [handle]" />
-  </stage>
-  <stage stageid="f6052444-d132-4b16-88c4-641af1772c11" name="sheetexists" type="Data">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
-    <narrative>
-    </narrative>
-    <displayx>-195</displayx>
-    <displayy>105</displayy>
-    <displaywidth>120</displaywidth>
-    <displayheight>30</displayheight>
-    <font family="Tahoma" size="10" style="Regular" color="000000" />
-    <datatype>flag</datatype>
-    <initialvalue />
-    <private />
-    <alwaysinit />
-  </stage>
-  <stage stageid="575dc319-2853-44fc-ae96-145bf0e0b96e" name="errorTest" type="Data">
-    <subsheetid>de91c894-3c34-40dc-ba12-6177f27f5ef5</subsheetid>
     <narrative>
     </narrative>
     <displayx>135</displayx>
